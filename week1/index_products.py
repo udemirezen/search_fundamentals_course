@@ -107,17 +107,20 @@ def index_file(file, index_name):
     root = tree.getroot()
     children = root.findall("./product")
     docs = []
+
     for child in children:
         doc = {}
         for idx in range(0, len(mappings), 2):
             xpath_expr = mappings[idx]
             key = mappings[idx + 1]
             doc[key] = child.xpath(xpath_expr)
+        
         #print(doc)
         if 'productId' not in doc or len(doc['productId']) == 0:
             continue
         docs.append({'_index': index_name, '_source': doc})
         docs_indexed += 1
+
         #### Step 2.b: Create a valid OpenSearch Doc and bulk index 2000 docs at a time
         if docs_indexed % 2000 == 0:
             bulk(client, docs, request_timeout=60) # timeout will help to avoid overloading the OS.
